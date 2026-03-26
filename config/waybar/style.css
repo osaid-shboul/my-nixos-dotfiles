@@ -1,0 +1,25 @@
+window#waybar {
+    background: rgba(26, 27, 38, 0.65); /* زجاجي شفاف */
+    border-radius: 15px;
+    color: #c0caf5;
+    font-family: "MesloLGS NF";
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#workspaces button {
+    padding: 0 10px;
+    color: #7aa2f7;
+}
+
+#workspaces button.active {
+    background: rgba(122, 162, 247, 0.2);
+    border-radius: 10px;
+}
+
+#clock, #battery, #cpu, #memory, #network, #pulseaudio {
+    padding: 0 12px;
+    margin: 3px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
