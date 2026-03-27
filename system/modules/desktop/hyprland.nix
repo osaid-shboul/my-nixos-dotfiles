@@ -55,6 +55,10 @@
     environment.sessionVariables = {
       NIXOS_OZONE_WL = "1";
       WLR_NO_HARDWARE_CURSORS = "1";
+      XCURSOR_THEME = "breeze_cursors";
+      XCURSOR_SIZE = "24";
+        # هذا السطر مهم جداً لبرامج الـ QT (مثل الآلة الحاسبة kcalc)
+      XDG_CURRENT_DESKTOP = "Hyprland";
     };
 
     # البرامج الخاصة بالواجهة
@@ -75,6 +79,8 @@
       libsecret             # لمساعدة الخزنة على حفظ الكلمات
       copyq
       wl-clipboard
+      kdePackages.breeze
+      adwaita-icon-theme
     ];
     
     # الخطوط المطلوبة للبار والأيقونات
