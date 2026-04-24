@@ -178,7 +178,7 @@
     dot = "cd ~/nixos-config";
     hyprconf = "nano ~/nixos-config/dotfiles/hypr/hyprland.conf";
     ai ="OPENAI_BASE_URL=http://127.0.0.1:11434/v1 npx @gitlawb/openclaude --model qwen2.5-coder:3b";
-    sync = "~/nixos-config/update.sh";
+    sync = "./update.sh";
   };
 
   # ============================================================================
