@@ -2,7 +2,7 @@
 
 {
   # ============================================================================
-  # 1. الاستيراد (Modules) - تأكد من وجود المجلدات في نفس المسار
+  # 1. الاستيراد (Modules)
   # ============================================================================
   imports = [ 
     ./hardware-configuration.nix
@@ -26,7 +26,6 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   
-  # تفعيل كافة تعريفات الهاردوير (ضروري للبلوتوث والواي فاي)
   hardware.enableAllFirmware = true;
 
   # ============================================================================
@@ -45,10 +44,8 @@
   features.development.enable = true;
   features.virtualisation.enable = true;
   features.tools.enable = true;
-      
-  # تفعيل Waybar كبرنامج نظام
+   
   programs.waybar.enable = true;
-
   # ============================================================================
   # 4. واجهة المستخدم واللغات (UI & Localization)
   # ============================================================================
@@ -64,9 +61,11 @@
     LC_TELEPHONE = "ar_JO.UTF-8";
     LC_TIME = "ar_JO.UTF-8";
   };
-  
-  services.ollama.enable = true;
+
   services.xserver.enable = true;
+  #  services.displayManager.sddm.enable = true;
+  #  services.desktopManager.plasma6.enable = true;
+
   services.xserver.xkb = {
     layout = "us";
     variant = "";
@@ -77,34 +76,22 @@
   # ============================================================================
   services.printing.enable = true;
   
-  # إعدادات الصوت (Pipewire)
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    jack.enable = true;
   };
 
-  # تفعيل البلوتوث مع دعم الميزات التجريبية (نسبة البطارية)
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Enable = "Source,Sink,Media,Socket";
-        Experimental = true;
-      };
-    };
-  };
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
   services.blueman.enable = true;
   
-  # دعم أيقونات النظام في البار (Tray Support)
-#  services.status-notifier-watcher.enable = true;
-
-  # تفعيل خزنة كلمات السر (GNOME Keyring)
+  # تفعيل خزنة كلمات السر
   services.gnome.gnome-keyring.enable = true;
+
+  # السماح لـ NetworkManager بحفظ الروابط في الخزنة
   security.pam.services.login.enableGnomeKeyring = true;
 
   # ============================================================================
@@ -113,8 +100,8 @@
   users.users.osaid = {
     isNormalUser = true;
     description = "osaid";
-    extraGroups = [ "networkmanager" "wheel" "docker" "video" "audio" ];
-    shell = pkgs.zsh;
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    shell = pkgs.zsh; # تفعيل Zsh للمستخدم
     packages = with pkgs; [ kdePackages.kate ];
   };
 
@@ -126,6 +113,7 @@
       enable = true;
       plugins = [ "git" "sudo" "docker" "command-not-found" ];
     };
+    # تشغيل ثيم Powerlevel10k
     promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
   };
 
@@ -136,37 +124,35 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    # أدوات النظام الأساسية
-    git vim wget fzf psmisc libnotify
-    
-    # الواجهة والبار (تعديل لدعم البلوتوث)
+    git
+    vim
+    wget
+    fzf
+    fastfetch        # أضفنا هذا البرنامج هنا
+    zsh-powerlevel10k
+    meslo-lgs-nf
     waybar
     networkmanagerapplet
-    pavucontrol # للتحكم بالصوت
-    blueman     # مدير البلوتوث
-    swww        # للخلفيات
-    brightnessctl # للتحكم بالسطوع
-    ollama
-
-    # البرامج اليومية
+    pavucontrol
+    libnotify
+    swww
+    psmisc
     google-chrome
-    fastfetch
-    zsh-powerlevel10k
-    nodejs
-    ripgrep
   ];
 
-  # إعدادات الخطوط (ضرورية للأيقونات في Waybar)
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
-    nerd-fonts.meslo-lg # النسخة الصحيحة للـ Nerd Font
-    font-awesome        # أيقونات البلوتوث والشبكة 
- ];
+    meslo-lgs-nf
+    nerdfonts
+    font-awsome
+  ];
 
   # ============================================================================
   # 8. إعدادات الـ Shell والإضافات (Shell Init & Aliases)
   # ============================================================================
+  
+  # هذا السطر يجب أن يكون خارج أي أقواس مربعة []
   environment.interactiveShellInit = ''
     fastfetch
   '';
@@ -174,11 +160,7 @@
   environment.shellAliases = {
     open = "nautilus . > /dev/null 2>&1 & disown";
     update = "sudo nixos-rebuild switch";
-    # تعديل الـ Aliases لتعمل من مجلدك المنظم
-    conf = "nano ~/nixos-config/system/configuration.nix";
-    dot = "cd ~/nixos-config";
-    hyprconf = "nano ~/nixos-config/dotfiles/hypr/hyprland.conf";
-    ai ="OPENAI_BASE_URL=http://127.0.0.1:11434/v1 npx @gitlawb/openclaude --model qwen2.5-coder:1.5b";
+    conf = "sudo nano /etc/nixos/configuration.nix";
   };
 
   # ============================================================================

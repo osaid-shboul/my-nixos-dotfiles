@@ -1,25 +1,50 @@
+/* الكود المنظف والجاهز */
 window#waybar {
-    background: rgba(26, 27, 38, 0.65); /* زجاجي شفاف */
-    border-radius: 15px;
+    background: rgba(15, 15, 25, 0.75);
+    border-radius: 12px;
     color: #c0caf5;
-    font-family: "MesloLGS NF";
-    font-size: 14px;
+    font-family: "JetBrainsMono Nerd Font", "MesloLGS NF", sans-serif;
+    font-size: 13px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px;
 }
 
 #workspaces button {
-    padding: 0 10px;
+    padding: 0 8px;
     color: #7aa2f7;
 }
 
 #workspaces button.active {
-    background: rgba(122, 162, 247, 0.2);
-    border-radius: 10px;
+    background: rgba(122, 162, 247, 0.3);
+    color: #ffffff;
+    border-radius: 8px;
 }
 
-#clock, #battery, #cpu, #memory, #network, #pulseaudio {
-    padding: 0 12px;
-    margin: 3px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+/* تأكد من عدم وجود فاصلة بعد آخر عنصر في القائمة */
+#clock,
+#battery,
+#cpu,
+#memory,
+#network,
+#pulseaudio,
+#bluetooth,
+#tray {
+    padding: 0 10px;
+    margin: 4px 2px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#pulseaudio.headphone {
+    color: #bb9af7;
+}
+
+#clock {
+    color: #9ece6a;
+    font-weight: bold;
+}
+
+#bluetooth {
+    color: #7dcfff;
 }
