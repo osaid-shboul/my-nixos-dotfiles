@@ -153,6 +153,14 @@
     zsh-powerlevel10k
     nodejs
     ripgrep
+    
+   # الوسائط المتعددة
+   loupe          # عارض الصور المودرن
+   mpv            # مشغل الفيديو الاحترافي
+   amberol        # مشغل الصوتيات الأنيق
+
+   # المكتب والأعمال
+   onlyoffice-desktopeditors
   ];
 
   # إعدادات الخطوط (ضرورية للأيقونات في Waybar)
