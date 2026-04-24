@@ -1,0 +1,15 @@
+=================================================
+             NixOS & Hyprland Shortcuts          
+=================================================
+  [Super + Q]       Terminal (Kitty)
+  [Super + 1]       Browser (Firefox)
+  [Super + E]       File Manager (Nautilus)
+  [Super + R]       App Launcher (Wofi)
+  [Super + C]       Calculator (KCalc)
+  [Super + Esc]     Task Manager (Btop)
+  [Super + V]       Clipboard (CopyQ)
+  [Print Screen]    Screenshot
+  [Super + X]       Close Window
+  [Super + Space]   Change Language
+=================================================
+    Press any key or wait 10s to close...
