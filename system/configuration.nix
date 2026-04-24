@@ -141,6 +141,8 @@
     tokyonight-gtk-theme
     papirus-icon-theme
     glib
+   
+    wezterm
   ];
 
   # إعدادات الخطوط (تمت إضافة خطوط عربية احترافية)
