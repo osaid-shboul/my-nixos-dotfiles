@@ -143,11 +143,19 @@
     glib
   ];
 
+  # إعدادات الخطوط (تمت إضافة خطوط عربية احترافية)
   fonts.packages = with pkgs; [
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
     nerd-fonts.meslo-lg
     font-awesome
+    
+    # خطوط عربية (جديد)
+    amiri        # خط القرآن الكريم والكتب الرسمي
+    noto-fonts   # خطوط جوجل الشاملة لكل اللغات
+    noto-fonts-cjk-sans
+    noto-fonts-color-emoji
+    freefont_ttf # خطوط عربية متنوعة
   ];
 
   # ============================================================================
