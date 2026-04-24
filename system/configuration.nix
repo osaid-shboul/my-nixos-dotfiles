@@ -65,7 +65,6 @@
     LC_TIME = "ar_JO.UTF-8";
   };
   
-  services.ollama.enable = true;
   services.xserver.enable = true;
   services.xserver.xkb = {
     layout = "us";
@@ -76,7 +75,7 @@
   # 5. الخدمات والأجهزة (Services & Hardware)
   # ============================================================================
   services.printing.enable = true;
-  
+  services.ollama.enable = true;
   # إعدادات الصوت (Pipewire)
   security.rtkit.enable = true;
   services.pipewire = {
@@ -175,10 +174,11 @@
     open = "nautilus . > /dev/null 2>&1 & disown";
     update = "sudo nixos-rebuild switch";
     # تعديل الـ Aliases لتعمل من مجلدك المنظم
-    conf = "nano ~/nixos-config/system/configuration.nix";
+    conf = "sudo nano ~/nixos-config/system/configuration.nix";
     dot = "cd ~/nixos-config";
     hyprconf = "nano ~/nixos-config/dotfiles/hypr/hyprland.conf";
-    ai ="OPENAI_BASE_URL=http://127.0.0.1:11434/v1 npx @gitlawb/openclaude --model qwen2.5-coder:1.5b";
+    ai ="OPENAI_BASE_URL=http://127.0.0.1:11434/v1 npx @gitlawb/openclaude --model qwen2.5-coder:3b";
+    sync = "~/nixos-config/update.sh";
   };
 
   # ============================================================================

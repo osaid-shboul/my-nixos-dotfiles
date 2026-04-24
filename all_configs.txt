@@ -1,0 +1,1224 @@
+
+
+=== ./system/configuration.nix.save ===
+{ config, pkgs, ... }:
+
+{
+  # ============================================================================
+  # 1. الاستيراد (Modules)
+  # ============================================================================
+  imports = [ 
+    ./hardware-configuration.nix
+    ./modules/timezone.nix
+    ./modules/tools.nix
+    ./modules/security
+    ./modules/nvidia.nix
+    ./modules/gaming.nix
+    ./modules/development.nix
+    ./modules/virtualisation.nix 
+    ./modules/desktop/hyprland.nix
+    ./modules/audio.nix
+  ];
+
+  # ============================================================================
+  # 2. إعدادات الإقلاع والشبكة (Boot & Networking)
+  # ============================================================================
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nixos";
+  networking.networkmanager.enable = true;
+  
+  hardware.enableAllFirmware = true;
+
+  # ============================================================================
+  # 3. الميزات المخصصة (Custom Features)
+  # ============================================================================
+  features.security.fail2ban.enable = true;
+  features.security.apparmor.enable = true;
+  features.security.ssh.enable = false;
+  features.security.permissions.enable = true;
+
+  features.nvidia.enable = false;
+  features.gaming.enable = false;
+  features.gaming.enableGamemode = false;
+  features.desktop.hyprland.enable = true;
+
+  features.development.enable = true;
+  features.virtualisation.enable = true;
+  features.tools.enable = true;
+   
+  programs.waybar.enable = true;
+  # ============================================================================
+  # 4. واجهة المستخدم واللغات (UI & Localization)
+  # ============================================================================
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "ar_JO.UTF-8";
+    LC_IDENTIFICATION = "ar_JO.UTF-8";
+    LC_MEASUREMENT = "ar_JO.UTF-8";
+    LC_MONETARY = "ar_JO.UTF-8";
+    LC_NAME = "ar_JO.UTF-8";
+    LC_NUMERIC = "ar_JO.UTF-8";
+    LC_PAPER = "ar_JO.UTF-8";
+    LC_TELEPHONE = "ar_JO.UTF-8";
+    LC_TIME = "ar_JO.UTF-8";
+  };
+
+  services.xserver.enable = true;
+  #  services.displayManager.sddm.enable = true;
+  #  services.desktopManager.plasma6.enable = true;
+
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
+
+  # ============================================================================
+  # 5. الخدمات والأجهزة (Services & Hardware)
+  # ============================================================================
+  services.printing.enable = true;
+  
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  services.blueman.enable = true;
+  
+  # تفعيل خزنة كلمات السر
+  services.gnome.gnome-keyring.enable = true;
+
+  # السماح لـ NetworkManager بحفظ الروابط في الخزنة
+  security.pam.services.login.enableGnomeKeyring = true;
+
+  # ============================================================================
+  # 6. إعدادات المستخدم والشيل (User & Shell)
+  # ============================================================================
+  users.users.osaid = {
+    isNormalUser = true;
+    description = "osaid";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    shell = pkgs.zsh; # تفعيل Zsh للمستخدم
+    packages = with pkgs; [ kdePackages.kate ];
+  };
+
+  programs.zsh = {
+    enable = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+    ohMyZsh = {
+      enable = true;
+      plugins = [ "git" "sudo" "docker" "command-not-found" ];
+    };
+    # تشغيل ثيم Powerlevel10k
+    promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+  };
+
+  # ============================================================================
+  # 7. البرامج والخطوط (Packages & Fonts)
+  # ============================================================================
+  programs.firefox.enable = true;
+  nixpkgs.config.allowUnfree = true;
+
+  environment.systemPackages = with pkgs; [
+    git
+    vim
+    wget
+    fzf
+    fastfetch        # أضفنا هذا البرنامج هنا
+    zsh-powerlevel10k
+    meslo-lgs-nf
+    waybar
+    networkmanagerapplet
+    pavucontrol
+    libnotify
+    swww
+    psmisc
+    google-chrome
+  ];
+
+  fonts.packages = with pkgs; [
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+    meslo-lgs-nf
+    nerdfonts
+    font-awsome
+  ];
+
+  # ============================================================================
+  # 8. إعدادات الـ Shell والإضافات (Shell Init & Aliases)
+  # ============================================================================
+  
+  # هذا السطر يجب أن يكون خارج أي أقواس مربعة []
+  environment.interactiveShellInit = ''
+    fastfetch
+  '';
+
+  environment.shellAliases = {
+    open = "nautilus . > /dev/null 2>&1 & disown";
+    update = "sudo nixos-rebuild switch";
+    conf = "sudo nano /etc/nixos/configuration.nix";
+  };
+
+  # ============================================================================
+  # 9. إصدار النظام
+  # ============================================================================
+  system.stateVersion = "25.11";
+}
+
+
+=== ./system/hardware-configuration.nix ===
+# Do not modify this file!  It was generated by ‘nixos-generate-config’
+# and may be overwritten by future invocations.  Please make changes
+# to /etc/nixos/configuration.nix instead.
+{ config, lib, pkgs, modulesPath, ... }:
+
+{
+  imports =
+    [ (modulesPath + "/installer/scan/not-detected.nix")
+    ];
+
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_usb_sdmmc" ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
+
+  fileSystems."/" =
+    { device = "/dev/disk/by-uuid/dc432d31-7ad8-4d7f-b385-dd74e0a5ce70";
+      fsType = "ext4";
+    };
+
+  fileSystems."/boot" =
+    { device = "/dev/disk/by-uuid/5DB5-C1F8";
+      fsType = "vfat";
+      options = [ "fmask=0077" "dmask=0077" ];
+    };
+
+  swapDevices = [ ];
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+}
+
+
+=== ./system/configuration.nix ===
+{ config, pkgs, ... }:
+
+{
+  # ============================================================================
+  # 1. الاستيراد (Modules) - تأكد من وجود المجلدات في نفس المسار
+  # ============================================================================
+  imports = [ 
+    ./hardware-configuration.nix
+    ./modules/timezone.nix
+    ./modules/tools.nix
+    ./modules/security
+    ./modules/nvidia.nix
+    ./modules/gaming.nix
+    ./modules/development.nix
+    ./modules/virtualisation.nix 
+    ./modules/desktop/hyprland.nix
+    ./modules/audio.nix
+  ];
+
+  # ============================================================================
+  # 2. إعدادات الإقلاع والشبكة (Boot & Networking)
+  # ============================================================================
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "nixos";
+  networking.networkmanager.enable = true;
+  
+  # تفعيل كافة تعريفات الهاردوير (ضروري للبلوتوث والواي فاي)
+  hardware.enableAllFirmware = true;
+
+  # ============================================================================
+  # 3. الميزات المخصصة (Custom Features)
+  # ============================================================================
+  features.security.fail2ban.enable = true;
+  features.security.apparmor.enable = true;
+  features.security.ssh.enable = false;
+  features.security.permissions.enable = true;
+
+  features.nvidia.enable = false;
+  features.gaming.enable = false;
+  features.gaming.enableGamemode = false;
+  features.desktop.hyprland.enable = true;
+
+  features.development.enable = true;
+  features.virtualisation.enable = true;
+  features.tools.enable = true;
+      
+  # تفعيل Waybar كبرنامج نظام
+  programs.waybar.enable = true;
+
+  # ============================================================================
+  # 4. واجهة المستخدم واللغات (UI & Localization)
+  # ============================================================================
+  i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "ar_JO.UTF-8";
+    LC_IDENTIFICATION = "ar_JO.UTF-8";
+    LC_MEASUREMENT = "ar_JO.UTF-8";
+    LC_MONETARY = "ar_JO.UTF-8";
+    LC_NAME = "ar_JO.UTF-8";
+    LC_NUMERIC = "ar_JO.UTF-8";
+    LC_PAPER = "ar_JO.UTF-8";
+    LC_TELEPHONE = "ar_JO.UTF-8";
+    LC_TIME = "ar_JO.UTF-8";
+  };
+  
+  services.ollama.enable = true;
+  services.xserver.enable = true;
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
+
+  # ============================================================================
+  # 5. الخدمات والأجهزة (Services & Hardware)
+  # ============================================================================
+  services.printing.enable = true;
+  
+  # إعدادات الصوت (Pipewire)
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+  };
+
+  # تفعيل البلوتوث مع دعم الميزات التجريبية (نسبة البطارية)
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+        Experimental = true;
+      };
+    };
+  };
+  services.blueman.enable = true;
+  
+  # دعم أيقونات النظام في البار (Tray Support)
+#  services.status-notifier-watcher.enable = true;
+
+  # تفعيل خزنة كلمات السر (GNOME Keyring)
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+
+  # ============================================================================
+  # 6. إعدادات المستخدم والشيل (User & Shell)
+  # ============================================================================
+  users.users.osaid = {
+    isNormalUser = true;
+    description = "osaid";
+    extraGroups = [ "networkmanager" "wheel" "docker" "video" "audio" ];
+    shell = pkgs.zsh;
+    packages = with pkgs; [ kdePackages.kate ];
+  };
+
+  programs.zsh = {
+    enable = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+    ohMyZsh = {
+      enable = true;
+      plugins = [ "git" "sudo" "docker" "command-not-found" ];
+    };
+    promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+  };
+
+  # ============================================================================
+  # 7. البرامج والخطوط (Packages & Fonts)
+  # ============================================================================
+  programs.firefox.enable = true;
+  nixpkgs.config.allowUnfree = true;
+
+  environment.systemPackages = with pkgs; [
+    # أدوات النظام الأساسية
+    git vim wget fzf psmisc libnotify
+    
+    # الواجهة والبار (تعديل لدعم البلوتوث)
+    waybar
+    networkmanagerapplet
+    pavucontrol # للتحكم بالصوت
+    blueman     # مدير البلوتوث
+    swww        # للخلفيات
+    brightnessctl # للتحكم بالسطوع
+    ollama
+
+    # البرامج اليومية
+    google-chrome
+    fastfetch
+    zsh-powerlevel10k
+    nodejs
+    ripgrep
+  ];
+
+  # إعدادات الخطوط (ضرورية للأيقونات في Waybar)
+  fonts.packages = with pkgs; [
+    nerd-fonts.fira-code
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.meslo-lg # النسخة الصحيحة للـ Nerd Font
+    font-awesome        # أيقونات البلوتوث والشبكة 
+ ];
+
+  # ============================================================================
+  # 8. إعدادات الـ Shell والإضافات (Shell Init & Aliases)
+  # ============================================================================
+  environment.interactiveShellInit = ''
+    fastfetch
+  '';
+
+  environment.shellAliases = {
+    open = "nautilus . > /dev/null 2>&1 & disown";
+    update = "sudo nixos-rebuild switch";
+    # تعديل الـ Aliases لتعمل من مجلدك المنظم
+    conf = "nano ~/nixos-config/system/configuration.nix";
+    dot = "cd ~/nixos-config";
+    hyprconf = "nano ~/nixos-config/dotfiles/hypr/hyprland.conf";
+    ai ="OPENAI_BASE_URL=http://127.0.0.1:11434/v1 npx @gitlawb/openclaude --model qwen2.5-coder:1.5b";
+  };
+
+  # ============================================================================
+  # 9. إصدار النظام
+  # ============================================================================
+  system.stateVersion = "25.11";
+}
+
+
+=== ./system/modules/timezone.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  time.timeZone = "Etc/GMT-3";
+}
+
+
+=== ./system/modules/audio.nix ===
+{ config, pkgs, ... }:
+
+{
+  # 1. تفعيل ميزة RTKit (مهمة جداً لإعطاء الصوت أولوية عالية في المعالج لمنع التقطيع)
+  security.rtkit.enable = true;
+
+  # 2. تفعيل محرك PipeWire الأساسي
+  services.pipewire = {
+    enable = true;
+    
+    # دعم البرامج التي تستخدم نظام ALSA الأساسي
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    
+    # دعم البرامج التي تستخدم نظام PulseAudio القديم
+    pulse.enable = true;
+    
+    # تفعيل مدير الجلسات (المسؤول عن توصيل السماعات والمايكروفون تلقائياً)
+    wireplumber.enable = true;
+  };
+
+  # 3. تثبيت برنامج رسومي للتحكم بمستوى الصوت
+  environment.systemPackages = with pkgs; [
+    pavucontrol # واجهة تحكم بالصوت (Volume Mixer)
+  ];
+}
+
+
+=== ./system/modules/nvidia.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+
+  options.features.nvidia = {
+    enable = lib.mkEnableOption "NVIDIA GPU drivers and CUDA support";
+  };
+
+  config = lib.mkIf config.features.nvidia.enable {
+    
+    services.xserver.videoDrivers = [ "nvidia" ];
+    
+    boot = {
+      kernelParams = [
+        "nvidia-drm.modeset=1"
+        "nvidia.NVreg_PreserveVideoMemoryAllocations=1" 
+      ];
+      blacklistedKernelModules = [ "nouveau" ];
+    };
+
+    environment.variables = {
+      LIBVA_DRIVER_NAME = "nvidia";
+      XDG_SESSION_TYPE = "wayland";
+      GBM_BACKEND = "nvidia-drm";
+      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      __GL_GSYNC_ALLOWED = "1";
+      __GL_VRR_ALLOWED = "1";
+    };
+
+    hardware = {
+      nvidia = {
+        open = false; 
+        nvidiaSettings = true;
+        modesetting.enable = true; 
+        powerManagement.enable = true;
+      };
+      graphics = {
+        enable = true;
+        enable32Bit = true;
+        extraPackages = with pkgs; [
+          nvidia-vaapi-driver
+          libva-vdpau-driver
+          libvdpau-va-gl
+          mesa
+          egl-wayland
+          vulkan-loader
+        ];
+      };
+    };
+
+    environment.systemPackages = with pkgs; [
+      vulkan-tools
+      mesa-demos
+    ];
+  };
+}
+
+
+=== ./system/modules/security/ssh.nix ===
+{ config, lib, ... }:
+
+{
+  options.features.security.ssh = {
+    enable = lib.mkEnableOption "Hardened SSH Server";
+  };
+
+  config = lib.mkIf config.features.security.ssh.enable {
+    
+    services.openssh = {
+      enable = true;
+      
+      settings = {
+        # 1. منع استخدام كلمات المرور نهائياً (يسمح فقط بالمفاتيح التشفيرية)
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
+        
+        # 2. منع حساب المدير (root) من تسجيل الدخول عن بعد
+        PermitRootLogin = "no";
+        
+        # 3. حصر الدخول على مستخدمين محددين فقط
+        AllowUsers = [ "osaid" ];
+      };
+
+      # 4. تغيير المنفذ الافتراضي لتضليل روبوتات الاختراق (اختياري لكنه مفيد)
+      ports = [ 2222 ]; 
+    };
+  };
+}
+
+
+=== ./system/modules/security/apparmor.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  options.features.security.apparmor = {
+    enable = lib.mkEnableOption "AppArmor Mandatory Access Control";
+  };
+
+  config = lib.mkIf config.features.security.apparmor.enable {
+    
+    # تفعيل نظام العزل
+    security.apparmor = {
+      enable = true;
+      enableCache = true; # لتسريع إقلاع النظام
+    };
+
+    # تفعيل نظام تسجيل ومراقبة الحوادث الأمنية
+    security.auditd.enable = true;
+    security.audit.enable = true;
+
+    # أدوات مساعدة للتحكم بالـ AppArmor من التيرمنال
+    environment.systemPackages = with pkgs; [
+      apparmor-utils
+      apparmor-profiles
+    ];
+  };
+}
+
+
+=== ./system/modules/security/fail2ban.nix ===
+{ config, lib, ... }:
+
+{
+  options.features.security.fail2ban = {
+    enable = lib.mkEnableOption "Fail2Ban Intrusion Prevention";
+  };
+
+  config = lib.mkIf config.features.security.fail2ban.enable {
+    services.fail2ban.enable = true;
+  };
+}
+
+
+=== ./system/modules/security/default.nix ===
+{ ... }:
+
+{
+  imports = [
+    ./firewall.nix
+    ./fail2ban.nix    
+    ./apparmor.nix
+    ./ssh.nix
+    ./permissions.nix
+    ];
+}
+
+
+=== ./system/modules/security/firewall.nix ===
+{ config, lib, ... }:
+
+{
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 80 443 ]; 
+    allowedUDPPorts = [ ];
+  };
+}
+
+
+=== ./system/modules/security/permissions.nix ===
+{ config, lib, ... }:
+
+{
+  options.features.security.permissions = {
+    enable = lib.mkEnableOption "Granular Permissions and Polkit";
+  };
+
+  config = lib.mkIf config.features.security.permissions.enable {
+    
+    security.polkit.enable = true;
+
+    security.sudo = {
+      enable = true;
+      
+      wheelNeedsPassword = true; 
+      
+      execWheelOnly = true;
+    };
+  };
+}
+
+
+=== ./system/modules/gaming.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  options.features.gaming = {
+    enable = lib.mkEnableOption "gaming support with Steam";
+    enableGamemode = lib.mkEnableOption "Feral GameMode";
+    enableGamescope = lib.mkEnableOption "gamescope session";
+  };
+
+  config = lib.mkIf config.features.gaming.enable {
+    
+      programs.steam = {
+      enable = true;
+      gamescopeSession.enable = config.features.gaming.enableGamescope;
+      extraCompatPackages = with pkgs; [ proton-ge-bin ];
+    };
+
+    programs.gamemode = lib.mkIf config.features.gaming.enableGamemode {
+      enable = true;
+      settings = {
+        general = { renice = 10; inhibit_screensaver = 1; };
+        gpu = { apply_gpu_optimisations = "accept-responsibility"; gpu_device = 0; nv_powermizer_mode = 1; };
+      };
+    };
+
+    environment.sessionVariables = {
+      STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
+      MANGOHUD_CONFIG = "fps,frametime,gpu_stats,gpu_temp,cpu_stats,cpu_temp,ram,vram";
+    };
+
+    environment.systemPackages = with pkgs; [
+      protonup-ng
+      lutris
+      mangohud
+      wine
+      winetricks
+    ];
+  };
+}
+
+
+=== ./system/modules/virtualisation.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  options.features.virtualisation = {
+    enable = lib.mkEnableOption "Docker Virtualisation Support";
+  };
+
+  config = lib.mkIf config.features.virtualisation.enable {
+    
+    # 1. تفعيل محرك Docker
+    virtualisation.docker = {
+      enable = true;
+      
+      # ميزة التنظيف التلقائي (لحذف الحاويات القديمة التي تستهلك مساحة التخزين)
+      autoPrune = {
+        enable = true;
+        dates = "weekly";
+      };
+    };
+
+    # 2. إضافة الأدوات المساعدة للنظام
+    environment.systemPackages = with pkgs; [
+      docker-compose  # أداة لتشغيل عدة حاويات معاً بملف واحد (مثل خادم + قاعدة بيانات)
+    ];
+  };
+}
+
+
+=== ./system/modules/tools.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  options.features.tools = {
+    enable = lib.mkEnableOption "Basic System Tools";
+  };
+
+  config = lib.mkIf config.features.tools.enable {
+    environment.systemPackages = with pkgs; [
+      wget
+      htop
+      fastfetch
+    ];
+  };
+}
+
+
+=== ./system/modules/desktop/hyprland.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  # ============================================================================
+  # 1. التعريف (Options)
+  # ============================================================================
+  options.features.desktop.hyprland = {
+    enable = lib.mkEnableOption "Hyprland Wayland Compositor";
+  };
+
+  # ============================================================================
+  # 2. الإعدادات (Configuration)
+  # ============================================================================
+  config = lib.mkIf config.features.desktop.hyprland.enable {
+    
+    # إعدادات شاشة الدخول
+    services.displayManager.sddm = {
+      enable = true;
+      wayland.enable = true;
+    };
+
+    # تفعيل Hyprland
+    programs.hyprland = {
+      enable = true;
+      xwayland.enable = true;
+    };
+
+    # تفعيل حفظ كلمات السر (ضروري للواي فاي)
+    services.gnome.gnome-keyring.enable = true;
+    security.pam.services.login.enableGnomeKeyring = true;
+
+    # تشغيل الخدمات تلقائياً عند الدخول للجلسة الرسومية
+    systemd.user.services = {
+      swww-daemon = {
+        description = "swww-daemon for wallpapers";
+        wantedBy = [ "graphical-session.target" ];
+        serviceConfig.ExecStart = "${pkgs.swww}/bin/swww-daemon";
+      };
+
+      waybar = {
+        description = "Waybar status bar";
+        wantedBy = [ "graphical-session.target" ];
+        serviceConfig.ExecStart = "${pkgs.waybar}/bin/waybar";
+      };
+
+      # تشغيل أيقونة الشبكة لتعمل في الخلفية وتحفظ الكلمات
+      nm-applet = {
+        description = "Network Manager Applet";
+        wantedBy = [ "graphical-session.target" ];
+        serviceConfig.ExecStart = "${pkgs.networkmanagerapplet}/bin/nm-applet --indicator";
+      };
+    };
+
+    # متغيرات النظام للواجهة
+    environment.sessionVariables = {
+      NIXOS_OZONE_WL = "1";
+      WLR_NO_HARDWARE_CURSORS = "1";
+      XCURSOR_THEME = "breeze_cursors";
+      XCURSOR_SIZE = "24";
+        # هذا السطر مهم جداً لبرامج الـ QT (مثل الآلة الحاسبة kcalc)
+      XDG_CURRENT_DESKTOP = "Hyprland";
+    };
+
+    # البرامج الخاصة بالواجهة
+    environment.systemPackages = with pkgs; [
+      kitty
+      waybar
+      wofi
+      hyprpaper
+      nautilus
+      grim
+      slurp
+      wl-clipboard
+      swww
+      psmisc
+      btop
+      kdePackages.kcalc
+      networkmanagerapplet # ضروري لإدارة الواي فاي
+      libsecret             # لمساعدة الخزنة على حفظ الكلمات
+      copyq
+      wl-clipboard
+      kdePackages.breeze
+      adwaita-icon-theme
+    ];
+    
+    # الخطوط المطلوبة للبار والأيقونات
+    fonts.packages = with pkgs; [
+      font-awesome
+      meslo-lgs-nf
+    ];
+  };
+}
+
+
+=== ./system/modules/development.nix ===
+{ config, lib, pkgs, ... }:
+
+{
+  options.features.development = {
+    enable = lib.mkEnableOption "Programming and Development Environment";
+  };
+
+  config = lib.mkIf config.features.development.enable {
+    environment.systemPackages = with pkgs; [
+      # أدوات البرمجة بلغة C
+      gcc           # المترجم الأساسي
+      gnumake       # أداة make الضرورية لترجمة المشاريع عبر ملفات Makefile
+      gdb           # مصحح الأخطاء لاكتشاف مشاكل العمليات والإشارات
+      valgrind      # أداة فحص تسريب الذاكرة (Memory leaks)
+      
+      # أدوات تطوير الويب
+      nodejs_20     # بيئة تشغيل خوادم Node.js
+      
+      # أدوات عامة للتحكم بالكود
+      git           # للتحكم بالنسخ
+      gh            # أداة GitHub الرسمية للتعامل مع المستودعات
+    
+     norminette
+     vscode
+     pkg-config
+     opencv
+     tesseract
+    ];
+  };
+}
+
+
+=== ./dotfiles/waybar/config' ===
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["hyprland/language" , "network", "battery", "clock"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate"
+    },
+    "clock": {
+        "format": "{:%H:%M - %A}",
+        "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "network": {
+        "format-wifi": "{essid} ",
+        "format-disconnected": "Disconnected ⚠"
+    },
+
+   "hyprland/language": {
+        "format": "{}",
+        "format-en": "EN",
+        "format-ar": "AR"
+    }
+}
+
+
+=== ./dotfiles/waybar/style.css ===
+/* الكود المنظف والجاهز */
+window#waybar {
+    background: rgba(15, 15, 25, 0.75);
+    border-radius: 12px;
+    color: #c0caf5;
+    font-family: "JetBrainsMono Nerd Font", "MesloLGS NF", sans-serif;
+    font-size: 13px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 5px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #7aa2f7;
+}
+
+#workspaces button.active {
+    background: rgba(122, 162, 247, 0.3);
+    color: #ffffff;
+    border-radius: 8px;
+}
+
+/* تأكد من عدم وجود فاصلة بعد آخر عنصر في القائمة */
+#clock,
+#battery,
+#cpu,
+#memory,
+#network,
+#pulseaudio,
+#bluetooth,
+#tray {
+    padding: 0 10px;
+    margin: 4px 2px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#pulseaudio.headphone {
+    color: #bb9af7;
+}
+
+#clock {
+    color: #9ece6a;
+    font-weight: bold;
+}
+
+#bluetooth {
+    color: #7dcfff;
+}
+
+=== ./dotfiles/waybar/config.jsonc ===
+{
+    "layer": "top",
+    "position": "top",
+    "margin-top": 5,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 4,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": [
+        "pulseaudio",
+        "bluetooth",
+        "network",
+        "cpu",
+        "memory",
+        "tray",
+        "clock"
+    ],    
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate"
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": " {:%H:%M}",
+        "tooltip-format": "{:%Y-%m-%d}"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}%",
+        "format-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {device_alias}",
+        "on-click": "blueman-manager"
+    },
+
+    "network": {
+        "format-wifi": " {essid}",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "⚠",
+        "on-click": "nm-connection-editor"
+    },
+
+    "cpu": {
+        "format": " {usage}%"
+    },
+
+    "memory": {
+        "format": " {}%"
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    }
+}
+
+=== ./dotfiles/waybar/config ===
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["hyprland/window"],
+    "modules-right": ["hyprland/language" , "network", "battery", "pulseaudio", "clock"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate"
+    },
+    "clock": {
+        "format": "{:%H:%M - %A}",
+        "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-icons": ["", "", "", "", ""]
+    },
+    "network": {
+        "format-wifi": "{essid} ",
+        "format-disconnected": "Disconnected ⚠"
+    },
+
+   "hyprland/language": {
+        "format": "{}",
+        "format-en": "EN",
+        "format-ar": "AR"
+    },
+   "pulseaudio": {
+      "format": "{volume}% {icon}",
+      "format-muted": "Muted ",
+      "format-icons": {
+         "headphone": "",
+         "default": ["", "", ""]
+     },
+       "scroll-step": 5,
+       "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+       "on-click-right": "pavucontrol"
+    }
+}
+
+
+
+=== ./dotfiles/hypr/hyprland.conf ===
+# --- الشاشة والعرض ---
+monitor=,preferred,auto,1
+
+# --- التشغيل التلقائي ---
+# ملاحظة: swww-daemon و waybar سيعملان تلقائياً عبر نظام Systemd الذي ضبطناه في ملف الـ Nix
+exec-once = hyprpaper
+exec-once = waybar
+exec-once = swww-daemon
+exec-once = nm-applet --indicator
+exec-once = copyq --start-server
+exec-once = hyprctl setcursor breeze_cursors 24
+exec-once = blueman-applet
+# --- المتغيرات الأساسية ---
+$mainMod = SUPER
+
+# --- الكيبورد واللغات ---
+input {
+    kb_layout = us,ara
+    kb_options = grp:win_space_toggle # التبديل بين العربي والإنجليزي بـ Super + Space
+}
+
+# --- المظهر الجمالي (النمط الزجاجي) ---
+general {
+    gaps_in = 0               # مسافات بين النوافذ
+    gaps_out = 5             # مسافات بين النافذة وطرف الشاشة
+    border_size = 2
+    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+    col.inactive_border = rgba(595959aa)
+    layout = dwindle
+}
+decoration {
+    rounding = 12
+    
+    blur {
+        enabled = true
+        size = 5
+        passes = 2
+    }
+
+    # التعديل الجديد هنا
+    shadow {
+        enabled = true
+        range = 4
+        render_power = 3
+        color = rgba(1a1a1aee)
+    }
+}
+
+# --- الاختصارات (Keybindings) ---
+bind = $mainMod, Q, exec, kitty
+bind = $mainMod, X, killactive,        # غيرنا اختصار الإغلاق لـ X لأن C محجوز للآلة الحاسبة
+bind = $mainMod, M, exit, 
+bind = $mainMod, R, exec, wofi --show drun
+bind = $mainMod, E, exec, nautilus
+bind = $mainMod, 1, exec, firefox      # متصفح قوقل
+bind = $mainMod, V, exec, copyq show
+bind = , Print, exec, grim -g "$(slurp)" - | wl-copy
+
+
+# آلة حاسبة وتاسك مانجر
+bind = $mainMod, C, exec, kcalc
+bind = $mainMod, Escape, exec, kitty --class taskmanager -e btop
+
+# تصوير الشاشة
+bind = , Print, exec, grim -g "$(slurp)" - | wl-copy
+
+# --- التنقل والتحكم بالنوافذ ---
+bind = $mainMod, left, movefocus, l
+bind = $mainMod, right, movefocus, r
+bind = $mainMod, up, movefocus, u
+bind = $mainMod, down, movefocus, d
+
+bind = $mainMod SHIFT, left, movewindow, l
+bind = $mainMod SHIFT, right, movewindow, r
+bind = $mainMod SHIFT, up, movewindow, u
+bind = $mainMod SHIFT, down, movewindow, d
+
+binde = $mainMod CTRL, left, resizeactive, -20 0
+binde = $mainMod CTRL, right, resizeactive, 20 0
+binde = $mainMod CTRL, up, resizeactive, 0 -20
+binde = $mainMod CTRL, down, resizeactive, 0 20
+
+# أزرار الصوت (Volume Keys)
+bind = , XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bind = , XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+
+# أزرار السطوع (Brightness Keys)
+bind = , XF86MonBrightnessUp, exec, brightnessctl set 5%+
+bind = , XF86MonBrightnessDown, exec, brightnessctl set 5%-
+
+# --- قواعد النوافذ (Window Rules) ---
+windowrulev2 = float, class:^(taskmanager)$
+windowrulev2 = size 800 600, class:^(taskmanager)$
+windowrulev2 = center, class:^(taskmanager)$
+windowrulev2 = opacity 0.92 0.85, class:^(kitty)$
+
+# قاعدة لجعل نافذة الكليب بورد تظهر بشكل طائر في المنتصف
+windowrulev2 = float, class:^(com.github.hluk.copyq)$
+windowrulev2 = size 800 500, class:^(com.github.hluk.copyq)$
+windowrulev2 = center, class:^(com.github.hluk.copyq)$
+
+
+cursor {
+    no_hardware_cursors = false
+}
+
+
+=== ./dotfiles/kitty/kitty.conf ===
+# الخط الذي قمنا بتثبيته
+font_family      MesloLGS NF
+font_size        12.0
+
+# الشفافية (0.8 تعني شفاف بنسبة 20%)
+background_opacity 0.8
+confirm_os_window_close 0
+
+# ألوان متناسقة مع الثيم الزجاجي
+foreground #cdd6f4
+background #1e1e2e
+
+
+=== ./dotfiles/fastfetch/config.jsonc ===
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "small",
+        "padding": {
+            "top": 2
+        },
+        "color": {
+            "1": "cyan",
+            "2": "green"
+        }
+    },
+    "modules": [
+        "title",
+        "os",
+        "host",
+        "kernel",
+        "uptime",
+        "shell",
+        "wm",
+        "terminal",
+        "cpu",
+        "memory",
+        "break",
+        "colors"
+    ]
+}
+
+
+=== ./all_configs.txt ===
+
+
+=== ./README.md ===
+# ❄️ NixOS & Hyprland Dotfiles
+
+نظام متكامل مبني على NixOS مع واجهة Hyprland الزجاجية، منظم باستخدام الروابط الرمزية (Symlinks) لسهولة التعديل والرفع.
+
+## 📂 الهيكل التنظيمي:
+- **system/**: يحتوي على إعدادات `/etc/nixos` (الحزم، الهاردوير، المستخدمين).
+- **dotfiles/**: يحتوي على إعدادات الواجهة (Hyprland, Waybar, Kitty, Fastfetch).
+
+## 🚀 كيفية الاستخدام:
+بعد تحميل المستودع، نقوم بإنشاء روابط رمزية لربط النظام بالمستودع:
+
+```bash
+# ربط إعدادات الواجهة
+ln -s ~/nixos-config/dotfiles/hypr ~/.config/hypr
+
+# ربط إعدادات النظام (يحتاج sudo)
+sudo ln -s ~/nixos-config/system/configuration.nix /etc/nixos/configuration.nix

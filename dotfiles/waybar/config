@@ -1,18 +1,26 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 30,
-    
-    "modules-left": ["hyprland/workspaces"],
-    "modules-center": ["hyprland/window"],
-    "modules-right": ["hyprland/language" , "network", "battery", "pulseaudio", "clock"],
+    "height": 34,
+    "spacing": 4,
+    "margin-top": 5,
+    "margin-left": 10,
+    "margin-right": 10,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["hyprland/language", "tray", "pulseaudio", "bluetooth", "network", "battery"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
         "on-click": "activate"
     },
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40
+    },
     "clock": {
-        "format": "{:%H:%M - %A}",
+        "format": " {:%H:%M - %A}",
         "tooltip-format": "<tt>{calendar}</tt>"
     },
     "battery": {
@@ -21,24 +29,33 @@
     },
     "network": {
         "format-wifi": "{essid} ",
-        "format-disconnected": "Disconnected ⚠"
+        "format-disconnected": "Disconnected ⚠",
+        "on-click": "nm-connection-editor"
     },
-
-   "hyprland/language": {
+    "hyprland/language": {
         "format": "{}",
         "format-en": "EN",
         "format-ar": "AR"
     },
-   "pulseaudio": {
-      "format": "{volume}% {icon}",
-      "format-muted": "Muted ",
-      "format-icons": {
-         "headphone": "",
-         "default": ["", "", ""]
-     },
-       "scroll-step": 5,
-       "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-       "on-click-right": "pavucontrol"
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon}",
+        "format-muted": "Muted ",
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", ""]
+        },
+        "scroll-step": 5,
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-click-right": "pavucontrol"
+    },
+    "bluetooth": {
+        "format": " {status}",
+        "format-connected": " {device_alias}",
+        "on-click": "blueman-manager"
+    },
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
     }
 }
-
