@@ -171,7 +171,7 @@
 
   # فرض الثيم الداكن على مستوى النظام (جديد)
   environment.sessionVariables = {
-    GTK_THEME = "Tokyo-Night";
+    GTK_THEME = "Tokyonight-Dark"; 
     XDG_CURRENT_DESKTOP = "Hyprland";
   };
 
